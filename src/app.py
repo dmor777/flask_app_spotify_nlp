@@ -1,12 +1,17 @@
-import pandas as pd
 from pickle import load
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from flask import Flask, request, render_template
 
 
 model = load(open('nn_6_auto_cosine.model',"rb"))
-
-df = pd.read_csv('datos_canciones_tags.csv')
+df = pd.read_excel("datos_merged_1986_2023.xlsx")
+df['year_s'] = df['year'].astype(str)
+df['duration_ms_s'] = df['duration_ms'].astype(str)
+df['popularity_s'] = df['popularity'].astype(str)
+df['tags'] = df['track_name'] + " " + df['popularity_s']+ " "+ df['duration_ms_s'] \
+    + " " + df['artist_genres']+ " " + df['year_s']
+df['tags'] = df['tags'].apply(lambda x: str(x).replace(";"," "))
 vectorizer = TfidfVectorizer()
 tfidf_matrix = vectorizer.fit_transform(df['tags'])
 
